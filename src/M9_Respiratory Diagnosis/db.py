@@ -7,7 +7,10 @@ import certifi
 
 load_dotenv()
 
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+MONGO_URI = os.getenv(
+    "MONGO_URI",
+    "mongodb+srv://aroy45062:oCI4tdVLSxdv0fDS@cluster0.xuxpx2s.mongodb.net/M9"
+)
 DB_NAME = "respiratory_diagnosis_db"
 
 client = MongoClient(MONGO_URI, tlsCAFile=certifi.where())
