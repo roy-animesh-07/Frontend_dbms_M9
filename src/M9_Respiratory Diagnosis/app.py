@@ -1,4 +1,6 @@
 import streamlit as st
+from backend_service import process_encounter_data
+import uuid
 
 st.set_page_config(page_title="Respiratory Symptom Diagnosis", layout="wide")
 
@@ -65,7 +67,80 @@ if page == "New Diagnosis":
             duration = st.text_input("Duration (e.g., 5 years, 2 months)")
 
     st.divider()
-    st.button("Submit Encounter & Calculate Score", type="primary")
+
+    if st.button("Submit Encounter & Calculate Score", type="primary"):
+        with st.spinner("Processing Data and Running Diagnostic Engine..."):
+            patient_data = {
+                "PatientID": str(uuid.uuid4()),
+                "Name": patient_name,
+                "DOB": str(patient_dob),
+                "Gender": patient_gender
+            }
+
+            encounter_data = {
+                "EncounterID": str(uuid.uuid4()),
+                "PatientID": patient_data["PatientID"],
+                "EncounterDate": encounter_date,
+                "EncounterType": encounter_type
+            }
+
+            symptom_data = {
+                "EncounterID": encounter_data["EncounterID"],
+                "SymptomType": symptom_type
+            }
+
+            cough_data = {
+                "EncounterID": encounter_data["EncounterID"],
+                "CoughType": cough_type
+            }
+
+            breath_data = {
+                "EncounterID": encounter_data["EncounterID"],
+                "Location": sound_location,
+                "SoundType": sound_type,
+                "Intensity": intensity,
+                "Pitch": pitch
+            }
+
+            smoking_data = {
+                "PatientID": patient_data["PatientID"],
+                "SmokingStatus": smoking_status,
+                "PacksPerDay": float(packs_per_day),
+                "YearsSmoked": float(years_smoked),
+                "QuitDate": str(quit_date) if quit_date else None
+            }
+
+            exposure_data = {
+                "PatientID": patient_data["PatientID"],
+                "ExposureType": exposure_type,
+                "Duration": duration,
+                "Setting": setting
+            }
+
+            result = process_encounter_data(
+                patient_data,
+                encounter_data,
+                symptom_data,
+                cough_data,
+                breath_data,
+                smoking_data,
+                exposure_data
+            )
+
+            if result["success"]:
+                st.success("Encounter processed successfully! Data saved to Database.")
+
+                st.subheader("📊 Diagnostic Engine Results")
+                score_data = result["score"]
+
+                col_rs1, col_rs2, col_rs3 = st.columns(3)
+                col_rs1.metric("Target Disease", score_data["TargetDisease"])
+                col_rs2.metric("Probability Score", f"{score_data['ProbabilityScore']}%")
+                col_rs3.metric("Risk Level", score_data["RiskLevel"])
+
+                st.info(f"Algorithm Version: {score_data['AlgorithmVersion']}")
+            else:
+                st.error(f"Error processing encounter: {result['message']}")
 
 elif page == "Past Reports":
     st.header("Past Diagnostic Reports")
