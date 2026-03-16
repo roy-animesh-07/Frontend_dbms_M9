@@ -104,52 +104,52 @@ def insert_or_update_disease_score(score_data: dict) -> str:
 
     return score_data["ScoreID"]
     def get_all_reports() -> list:
-    pipeline = [
-        {
-            "$lookup": {
-                "from": "clinical_encounters",
-                "localField": "EncounterID",
-                "foreignField": "EncounterID",
-                "as": "encounter"
+        pipeline = [
+            {
+                "$lookup": {
+                    "from": "clinical_encounters",
+                    "localField": "EncounterID",
+                    "foreignField": "EncounterID",
+                    "as": "encounter"
+                }
+            },
+            {
+                "$unwind": {
+                    "path": "$encounter",
+                    "preserveNullAndEmptyArrays": True
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "patients",
+                    "localField": "encounter.PatientID",
+                    "foreignField": "PatientID",
+                    "as": "patient"
+                }
+            },
+            {
+                "$unwind": {
+                    "path": "$patient",
+                    "preserveNullAndEmptyArrays": True
+                }
+            },
+            {
+                "$project": {
+                    "_id": 0,
+                    "ScoreID": 1,
+                    "EncounterID": 1,
+                    "TargetDisease": 1,
+                    "ProbabilityScore": 1,
+                    "RiskLevel": 1,
+                    "AlgorithmVersion": 1,
+                    "EncounterDate": "$encounter.EncounterDate",
+                    "PatientName": "$patient.Name",
+                    "PatientID": "$patient.PatientID"
+                }
+            },
+            {
+                "$sort": {"EncounterDate": -1}
             }
-        },
-        {
-            "$unwind": {
-                "path": "$encounter",
-                "preserveNullAndEmptyArrays": True
-            }
-        },
-        {
-            "$lookup": {
-                "from": "patients",
-                "localField": "encounter.PatientID",
-                "foreignField": "PatientID",
-                "as": "patient"
-            }
-        },
-        {
-            "$unwind": {
-                "path": "$patient",
-                "preserveNullAndEmptyArrays": True
-            }
-        },
-        {
-            "$project": {
-                "_id": 0,
-                "ScoreID": 1,
-                "EncounterID": 1,
-                "TargetDisease": 1,
-                "ProbabilityScore": 1,
-                "RiskLevel": 1,
-                "AlgorithmVersion": 1,
-                "EncounterDate": "$encounter.EncounterDate",
-                "PatientName": "$patient.Name",
-                "PatientID": "$patient.PatientID"
-            }
-        },
-        {
-            "$sort": {"EncounterDate": -1}
-        }
-    ]
+        ]
 
     return list(db.disease_probability_scores.aggregate(pipeline))
