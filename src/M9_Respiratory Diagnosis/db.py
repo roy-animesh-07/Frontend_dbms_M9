@@ -9,7 +9,7 @@ load_dotenv()
 
 MONGO_URI = os.getenv(
     "MONGO_URI",
-    "mongodb+srv://aroy45062:oCI4tdVLSxdv0fDS@cluster0.xuxpx2s.mongodb.net/M9"
+    "mongodb://localhost:27017"
 )
 DB_NAME = "respiratory_diagnosis_db"
 
