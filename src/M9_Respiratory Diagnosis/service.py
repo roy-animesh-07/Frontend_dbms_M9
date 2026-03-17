@@ -1,6 +1,10 @@
 import uuid
 from datetime import datetime, date
 
+from database import (
+    insert_patient, insert_encounter, insert_symptom, 
+    insert_cough_characteristic, insert_breath_sound
+)
 def process_encounter_data(patient, encounter, symptom, cough, breath, smoking, exposure):
     try:
         # Link relations using IDs
@@ -23,6 +27,12 @@ def process_encounter_data(patient, encounter, symptom, cough, breath, smoking, 
         smoking["PatientID"] = patient_id
         exposure["PatientID"] = patient_id
 
+        insert_patient(patient)
+        insert_encounter(encounter)
+        insert_symptom(symptom)
+        insert_cough_characteristic(cough)
+        insert_breath_sound(breath)
+        
         return {"success": True, "message": "Data linked successfully"}
 
     except Exception as e:
