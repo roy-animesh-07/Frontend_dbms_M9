@@ -5,7 +5,8 @@ from database import (
     insert_patient, insert_encounter, insert_symptom, 
     insert_cough_characteristic, insert_breath_sound,
     update_smoking_history, update_environmental_exposure,
-    insert_or_update_disease_score, get_all_reports
+    insert_or_update_disease_score, 
+    get_all_reports
 )
 
 def calculate_disease_probability(symptom_data, cough_data, breath_data, smoking_data, exposure_data):
@@ -59,11 +60,18 @@ def process_encounter_data(patient, encounter, symptom, cough, breath, smoking, 
         insert_or_update_disease_score(score_data)
 
         return {"success": True, 
-                "message": "Data and Risk factors processed successfully",
+                "message": "Data processed successfully",
                 "score": score_data
                 }
+
 
     except Exception as e:
         return {"success": False, 
                 "message": str(e)
                }
+def fetch_past_reports():
+    try:
+        reports = get_all_reports()
+        return {"success": True, "data": reports}
+    except Exception as e:
+        return {"success": False, "message": str(e)}
