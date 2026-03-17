@@ -3,8 +3,19 @@ from datetime import datetime, date
 
 from database import (
     insert_patient, insert_encounter, insert_symptom, 
-    insert_cough_characteristic, insert_breath_sound
+    insert_cough_characteristic, insert_breath_sound,
+    update_smoking_history, update_environmental_exposure,
+    insert_or_update_disease_score, get_all_reports
 )
+
+def calculate_disease_probability(symptom_data, cough_data, breath_data, smoking_data, exposure_data):
+    # Mock Diagnostic Engine
+    return {
+        "TargetDisease": "Pending Analysis",
+        "ProbabilityScore": 0,
+        "RiskLevel": "Pending",
+        "AlgorithmVersion": "v0.0-pending"
+    }
 def process_encounter_data(patient, encounter, symptom, cough, breath, smoking, exposure):
     try:
         # Link relations using IDs
@@ -32,8 +43,27 @@ def process_encounter_data(patient, encounter, symptom, cough, breath, smoking, 
         insert_symptom(symptom)
         insert_cough_characteristic(cough)
         insert_breath_sound(breath)
+        update_smoking_history(smoking)
+        update_environmental_exposure(exposure)
+
+        score_result = calculate_disease_probability(symptom, cough, breath, smoking, exposure)
         
-        return {"success": True, "message": "Data linked successfully"}
+        score_data = {
+            "EncounterID": encounter_id,
+            "TargetDisease": score_result["TargetDisease"],
+            "ProbabilityScore": score_result["ProbabilityScore"],
+            "RiskLevel": score_result["RiskLevel"],
+            "AlgorithmVersion": score_result["AlgorithmVersion"]
+        }
+        
+        insert_or_update_disease_score(score_data)
+
+        return {"success": True, 
+                "message": "Data and Risk factors processed successfully",
+                "score": score_data
+                }
 
     except Exception as e:
-        return {"success": False, "message": str(e)}
+        return {"success": False, 
+                "message": str(e)
+               }
