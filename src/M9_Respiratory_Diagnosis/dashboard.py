@@ -31,20 +31,16 @@ with tabs[0]:
         st.markdown("### Input Entities")
         st.info("""
         1️⃣ Patient Form  
-        2️⃣ Clinical Encounter Form          
-        3️⃣ Symptom Assessment and Cough Characteristic Form        
-        4️⃣ Breath Sound Assessment Form       
-        5️⃣ Smoking History and Environmental Exposure Form
+        2️⃣ Insurance Details  
+        3️⃣ Emergency Contact
         """)
 
     with col2:
         st.markdown("### Output Entities")
         st.success("""
         1️⃣ Patient Record  
-        2️⃣ Probability Score Report  
-        3️⃣ Risk Level       
-         4️⃣ Target Disease Prediction
-                   
+        2️⃣ Admission Summary  
+        3️⃣ Patient ID
         """)
 
     st.markdown("---")
@@ -59,7 +55,7 @@ with tabs[1]:
     st.write("Database Entity Relationship Diagram")
 
     st.image(
-        "er_diagram-2.jpg",
+        "ER.png",
         use_container_width=True
     )
 
